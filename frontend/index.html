@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>화장품 영상 메이커</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Malgun Gothic', sans-serif;
+            background: linear-gradient(135deg, #f5f5f0 0%, #e8e8e0 100%);
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 24px;
+            padding: 32px 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #2c2c2c 0%, #5a5a5a 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            font-size: 14px;
+            color: #8a8a8a;
+        }
+
+        .section {
+            margin-bottom: 28px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .concept-input {
+            width: 100%;
+            padding: 16px;
+            border: 2px solid #f0f0f0;
+            border-radius: 16px;
+            font-size: 15px;
+            font-family: inherit;
+            transition: all 0.3s;
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .concept-input:focus {
+            outline: none;
+            border-color: #2c2c2c;
+            box-shadow: 0 0 0 4px rgba(44, 44, 44, 0.08);
+        }
+
+        .style-pills {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .style-pill {
+            padding: 14px;
+            border: 2px solid #f0f0f0;
+            border-radius: 14px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 500;
+            color: #666;
+        }
+
+        .style-pill:hover {
+            border-color: #2c2c2c;
+            transform: translateY(-2px);
+        }
+
+        .style-pill.active {
+            border-color: #2c2c2c;
+            background: linear-gradient(135deg, #f8f8f8 0%, #ececec 100%);
+            color: #2c2c2c;
+            font-weight: 600;
+        }
+
+        .style-pill .icon {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+
+        .color-palette {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .color-swatch {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .color-swatch:hover {
+            transform: scale(1.1);
+        }
+
+        .color-swatch.active {
+            box-shadow: 0 0 0 3px #2c2c2c;
+            transform: scale(1.15);
+        }
+
+        .mood-slider-container {
+            padding: 0 8px;
+        }
+
+        .mood-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .mood-slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: linear-gradient(to right, #e0e0e0 0%, #2c2c2c 100%);
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .mood-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: white;
+            border: 3px solid #2c2c2c;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .mood-slider::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: white;
+            border: 3px solid #2c2c2c;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .generate-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #2c2c2c 0%, #1a1a1a 100%);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 8px 24px rgba(44, 44, 44, 0.25);
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(44, 44, 44, 0.35);
+        }
+
+        .generate-btn:active {
+            transform: translateY(0);
+        }
+
+        .generate-btn:disabled {
+            background: #ddd;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .preview-section {
+            margin-top: 32px;
+            padding-top: 32px;
+            border-top: 2px solid #f0f0f0;
+        }
+
+        .phone-mockup {
+            background: #1a1a1a;
+            border-radius: 32px;
+            padding: 12px;
+            margin: 0 auto 20px;
+            width: 280px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .phone-screen {
+            background: #f5f5f5;
+            border-radius: 24px;
+            aspect-ratio: 9/16;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-size: 14px;
+            position: relative;
+        }
+
+        .phone-screen.loading {
+            background: linear-gradient(135deg, #e8e8e0 0%, #d0d0c8 100%);
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(44, 44, 44, 0.15);
+            border-top-color: #2c2c2c;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .preview-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .download-btn {
+            width: 100%;
+            padding: 16px;
+            background: white;
+            color: #2c2c2c;
+            border: 2px solid #2c2c2c;
+            border-radius: 14px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .download-btn:hover {
+            background: #2c2c2c;
+            color: white;
+        }
+
+        .result-info {
+            text-align: center;
+            margin-bottom: 16px;
+            padding: 16px;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+
+        .result-info h3 {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .result-info p {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #333;
+            color: white;
+            padding: 14px 24px;
+            border-radius: 12px;
+            font-size: 14px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💄 화장품 영상 메이커</h1>
+            <p>컨셉만 입력하면 자동으로 인스타 영상 생성</p>
+        </div>
+
+        <!-- 컨셉 입력 -->
+        <div class="section">
+            <div class="section-title">✨ 컨셉 입력</div>
+            <textarea 
+                class="concept-input" 
+                id="conceptInput"
+                placeholder="예시: 비건 립스틱, 핑크톤, 럭셔리 무드&#10;&#10;제품 특징, 컬러, 분위기를 자유롭게 입력해주세요!"
+            ></textarea>
+        </div>
+
+        <!-- 스타일 선택 -->
+        <div class="section">
+            <div class="section-title">🎨 스타일</div>
+            <div class="style-pills">
+                <div class="style-pill active" data-style="minimal">
+                    <div class="icon">⚪</div>
+                    <div>미니멀</div>
+                </div>
+                <div class="style-pill" data-style="luxury">
+                    <div class="icon">✨</div>
+                    <div>럭셔리</div>
+                </div>
+                <div class="style-pill" data-style="natural">
+                    <div class="icon">🌿</div>
+                    <div>내추럴</div>
+                </div>
+                <div class="style-pill" data-style="vibrant">
+                    <div class="icon">🌈</div>
+                    <div>비비드</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 컬러 선택 -->
+        <div class="section">
+            <div class="section-title">💅 주요 컬러</div>
+            <div class="color-palette">
+                <div class="color-swatch active" data-color="nude" style="background: #d4bfaa;"></div>
+                <div class="color-swatch" data-color="taupe" style="background: #a89f91;"></div>
+                <div class="color-swatch" data-color="sage" style="background: #b5b8a3;"></div>
+                <div class="color-swatch" data-color="mauve" style="background: #c9b5b8;"></div>
+                <div class="color-swatch" data-color="slate" style="background: #7a7a7a;"></div>
+                <div class="color-swatch" data-color="cream" style="background: #e8dcc6;"></div>
+            </div>
+        </div>
+
+        <!-- 무드 슬라이더 -->
+        <div class="section">
+            <div class="section-title">💖 분위기</div>
+            <div class="mood-slider-container">
+                <div class="mood-labels">
+                    <span>큐트</span>
+                    <span>세련됨</span>
+                </div>
+                <input type="range" class="mood-slider" id="moodSlider" min="0" max="100" value="50">
+            </div>
+        </div>
+
+        <!-- 생성 버튼 -->
+        <button class="generate-btn" id="generateBtn">
+            🎬 영상 생성하기
+        </button>
+
+        <!-- 미리보기 영역 -->
+        <div class="preview-section hidden" id="previewSection">
+            <div class="section-title">📱 미리보기</div>
+            
+            <div class="result-info hidden" id="resultInfo">
+                <h3>✅ 생성 완료!</h3>
+                <p id="resultDescription"></p>
+            </div>
+
+            <div class="phone-mockup">
+                <div class="phone-screen" id="phoneScreen">
+                    <span id="previewPlaceholder">생성 버튼을 눌러주세요</span>
+                    <div class="loading-spinner hidden" id="loadingSpinner"></div>
+                    <img class="preview-image hidden" id="previewImage" alt="생성된 영상 프리뷰">
+                </div>
+            </div>
+
+            <button class="download-btn hidden" id="downloadBtn">
+                ⬇️ 다운로드
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // 전역 변수
+        let selectedStyle = 'minimal';
+        let selectedColor = 'nude';
+        let moodValue = 50;
+
+        // DOM 요소
+        const conceptInput = document.getElementById('conceptInput');
+        const stylePills = document.querySelectorAll('.style-pill');
+        const colorSwatches = document.querySelectorAll('.color-swatch');
+        const moodSlider = document.getElementById('moodSlider');
+        const generateBtn = document.getElementById('generateBtn');
+        const previewSection = document.getElementById('previewSection');
+        const phoneScreen = document.getElementById('phoneScreen');
+        const previewPlaceholder = document.getElementById('previewPlaceholder');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const previewImage = document.getElementById('previewImage');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const resultInfo = document.getElementById('resultInfo');
+        const resultDescription = document.getElementById('resultDescription');
+
+        // 스타일 선택
+        stylePills.forEach(pill => {
+            pill.addEventListener('click', function() {
+                stylePills.forEach(p => p.classList.remove('active'));
+                this.classList.add('active');
+                selectedStyle = this.dataset.style;
+            });
+        });
+
+        // 컬러 선택
+        colorSwatches.forEach(swatch => {
+            swatch.addEventListener('click', function() {
+                colorSwatches.forEach(s => s.classList.remove('active'));
+                this.classList.add('active');
+                selectedColor = this.dataset.color;
+            });
+        });
+
+        // 무드 슬라이더
+        moodSlider.addEventListener('input', function() {
+            moodValue = this.value;
+        });
+
+        // 토스트 메시지 표시
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        // API endpoint
+        const API_URL = 'http://localhost:3000/api';
+        let currentVideoUrl = null;
+
+        // 영상 생성
+        generateBtn.addEventListener('click', async function() {
+            const concept = conceptInput.value.trim();
+            
+            if (!concept) {
+                showToast('컨셉을 입력해주세요! ✏️');
+                conceptInput.focus();
+                return;
+            }
+
+            // UI 업데이트
+            previewSection.classList.remove('hidden');
+            previewPlaceholder.classList.add('hidden');
+            loadingSpinner.classList.remove('hidden');
+            phoneScreen.classList.add('loading');
+            previewImage.classList.add('hidden');
+            downloadBtn.classList.add('hidden');
+            resultInfo.classList.add('hidden');
+            
+            generateBtn.disabled = true;
+            generateBtn.textContent = '생성 중... ⏳ (1-2분 소요)';
+
+            // 스크롤 이동
+            setTimeout(() => {
+                previewSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
+
+            try {
+                // 실제 API 호출
+                showToast('AI가 이미지를 생성하고 있습니다... 🎨');
+                
+                const response = await fetch(`${API_URL}/generate`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        concept,
+                        style: selectedStyle,
+                        color: selectedColor,
+                        mood: moodValue
+                    })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.message || 'Generation failed');
+                }
+
+                const result = await response.json();
+                console.log('Generation result:', result);
+                
+                // 결과 표시 - 비디오로 표시
+                currentVideoUrl = `${API_URL.replace('/api', '')}${result.videoUrl}`;
+                
+                // 비디오 엘리먼트로 교체
+                phoneScreen.innerHTML = `
+                    <video class="preview-image" autoplay loop muted playsinline>
+                        <source src="${currentVideoUrl}" type="video/mp4">
+                        브라우저가 비디오를 지원하지 않습니다.
+                    </video>
+                `;
+                
+                loadingSpinner.classList.add('hidden');
+                phoneScreen.classList.remove('loading');
+                downloadBtn.classList.remove('hidden');
+                resultInfo.classList.remove('hidden');
+                
+                // 결과 정보 업데이트
+                const moodText = moodValue < 50 ? '큐트' : '세련된';
+                resultDescription.textContent = `${selectedStyle} 스타일 • ${selectedColor} 컬러 • ${moodText} 분위기`;
+                
+                generateBtn.disabled = false;
+                generateBtn.textContent = '🎬 영상 생성하기';
+                
+                showToast('영상이 생성되었습니다! 🎉');
+                
+            } catch (error) {
+                console.error('Generation error:', error);
+                showToast(`생성 중 오류: ${error.message} 😢`);
+                
+                loadingSpinner.classList.add('hidden');
+                previewPlaceholder.classList.remove('hidden');
+                previewPlaceholder.textContent = '생성 실패. 서버가 실행 중인지 확인해주세요.';
+                phoneScreen.classList.remove('loading');
+                
+                generateBtn.disabled = false;
+                generateBtn.textContent = '🎬 영상 생성하기';
+            }
+        });
+
+
+
+        // 다운로드
+        downloadBtn.addEventListener('click', function() {
+            if (!currentVideoUrl) {
+                showToast('다운로드할 영상이 없습니다');
+                return;
+            }
+            
+            showToast('다운로드를 시작합니다... 📥');
+            
+            // 다운로드 링크 생성
+            const a = document.createElement('a');
+            a.href = currentVideoUrl;
+            a.download = `cosmetic-video-${Date.now()}.mp4`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            
+            setTimeout(() => {
+                showToast('다운로드가 완료되었습니다! ✅');
+            }, 1000);
+        });
+
+        // 엔터키로 생성
+        conceptInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && e.ctrlKey) {
+                generateBtn.click();
+            }
+        });
+    </script>
+</body>
+</html>
